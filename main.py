@@ -3,6 +3,7 @@
 import argparse
 import datetime
 import numpy as np
+import os
 import time
 import torch
 import torch.backends.cudnn as cudnn
@@ -33,11 +34,14 @@ def get_args_parser():
     parser.add_argument('--model', default='deit_base_patch16_224', type=str, metavar='MODEL',
                         help='Name of model to train')
     parser.add_argument('--input-size', default=224, type=int, help='images input size')
+    parser.add_argument('--pretrained', action='store_true', help='load pretrained weights for the model')
+    parser.add_argument('--models_directory', default="./models", type=str, help='directory containing pretrained weights for the model')
 
     parser.add_argument('--drop', type=float, default=0.0, metavar='PCT',
                         help='Dropout rate (default: 0.)')
     parser.add_argument('--drop-path', type=float, default=0.1, metavar='PCT',
                         help='Drop path rate (default: 0.1)')
+
 
     parser.add_argument('--model-ema', action='store_true')
     parser.add_argument('--no-model-ema', action='store_false', dest='model_ema')
@@ -132,8 +136,8 @@ def get_args_parser():
                         choices=['kingdom', 'phylum', 'class', 'order', 'supercategory', 'family', 'genus', 'name'],
                         type=str, help='semantic granularity')
 
-    parser.add_argument('--output_dir', default='',
-                        help='path where to save, empty for no saving')
+    parser.add_argument('--wandb_project', default="", help="wandb project where to log metrics, empty does not log")
+    parser.add_argument('--output_dir', default="", help='path where to save, empty for no saving')
     parser.add_argument('--device', default='cuda',
                         help='device to use for training / testing')
     parser.add_argument('--seed', default=0, type=int)
@@ -158,6 +162,7 @@ def get_args_parser():
 
 def main(args):
     utils.init_distributed_mode(args)
+    utils.init_wandb_and_create_output_folder(args)
 
     print(args)
 
@@ -223,13 +228,17 @@ def main(args):
             label_smoothing=args.smoothing, num_classes=args.nb_classes)
 
     print(f"Creating model: {args.model}")
+    extra_kwargs = {}
+    if "collab" in args.model and args.pretrained:
+        extra_kwargs["models_directory"] = args.models_directory
     model = create_model(
         args.model,
-        pretrained=False,
+        pretrained=args.pretrained,
         num_classes=args.nb_classes,
         drop_rate=args.drop,
         drop_path_rate=args.drop_path,
         drop_block_rate=None,
+        **extra_kwargs
     )
 
     # TODO: finetuning
@@ -324,6 +333,7 @@ def main(args):
                      **{f'test_{k}': v for k, v in test_stats.items()},
                      'epoch': epoch,
                      'n_parameters': n_parameters}
+        utils.log_wandb(log_stats)
 
         if args.output_dir and utils.is_main_process():
             with (output_dir / "log.txt").open("a") as f:
@@ -337,6 +347,4 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('DeiT training and evaluation script', parents=[get_args_parser()])
     args = parser.parse_args()
-    if args.output_dir:
-        Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     main(args)
