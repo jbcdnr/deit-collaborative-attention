@@ -1,9 +1,24 @@
 # DeiT with Collaborative Attention
 
-This repo contains the supplentary code to use collaborative attention with Vision Transformer.
-Refer to the paper's [repository](https://github.com/epfml/collaborative-attention) for more information.
+This repo contains the code to use collaborative attention with Vision Transformer.
+Refer to the [paper's repository](https://github.com/epfml/collaborative-attention) for more information.
 
-=====
+## Citation
+
+If you find this code useful, please cite the paper:
+
+```
+@misc{cordonnier2020multihead,
+    title={Multi-Head Attention: Collaborate Instead of Concatenate},
+    author={Jean-Baptiste Cordonnier and Andreas Loukas and Martin Jaggi},
+    year={2020},
+    eprint={2006.16362},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+```
+
+----------------------
 
 This repository contains PyTorch evaluation code, training code and pretrained models for DeiT (Data-Efficient Image Transformers).
 
