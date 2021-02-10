@@ -1,4 +1,9 @@
-# DeiT: Data-efficient Image Transformers
+# DeiT with Collaborative Attention
+
+This repo contains the supplentary code to use collaborative attention with Vision Transformer.
+Refer to the paper's [repository](https://github.com/epfml/collaborative-attention) for more information.
+
+=====
 
 This repository contains PyTorch evaluation code, training code and pretrained models for DeiT (Data-Efficient Image Transformers).
 
@@ -6,7 +11,7 @@ They obtain competitive tradeoffs in terms of speed / precision:
 
 ![DeiT](.github/deit.png)
 
-For details see [Training data-efficient image transformers & distillation through attention](https://arxiv.org/abs/2012.12877) by Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles and Hervé Jégou. 
+For details see [Training data-efficient image transformers & distillation through attention](https://arxiv.org/abs/2012.12877) by Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles and Hervé Jégou.
 
 If you use this code for a paper please cite:
 
@@ -31,7 +36,7 @@ We provide baseline DeiT models pretrained on ImageNet 2012.
 
 
 The models are also available via torch hub.
-Before using it, make sure you have the pytorch-image-models package [`timm==0.3.2`](https://github.com/rwightman/pytorch-image-models) by [Ross Wightman](https://github.com/rwightman) installed. Note that our work relies of the augmentations proposed in this library. In particular, the RandAugment and RandErasing augmentations that we invoke are the improved versions from the timm library, which already led the timm authors to report up to 79.35% top-1 accuracy with Imagenet training for their best model, i.e., an improvement of about +1.5% compared to prior art. 
+Before using it, make sure you have the pytorch-image-models package [`timm==0.3.2`](https://github.com/rwightman/pytorch-image-models) by [Ross Wightman](https://github.com/rwightman) installed. Note that our work relies of the augmentations proposed in this library. In particular, the RandAugment and RandErasing augmentations that we invoke are the improved versions from the timm library, which already led the timm authors to report up to 79.35% top-1 accuracy with Imagenet training for their best model, i.e., an improvement of about +1.5% compared to prior art.
 
 To load DeiT-base with pretrained weights on ImageNet simply do:
 
@@ -96,7 +101,7 @@ giving
 * Acc@1 79.854 Acc@5 94.968 loss 0.881
 ```
 
-Note that Deit-small is *not* the same model as in Timm. 
+Note that Deit-small is *not* the same model as in Timm.
 
 And for Deit-tiny:
 ```
