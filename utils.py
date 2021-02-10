@@ -10,6 +10,8 @@ import os
 import time
 from collections import defaultdict, deque
 import datetime
+from pathlib import Path
+import sys
 
 import torch
 import torch.distributed as dist
@@ -236,3 +238,31 @@ def init_distributed_mode(args):
                                          world_size=args.world_size, rank=args.rank)
     torch.distributed.barrier()
     setup_for_distributed(args.rank == 0)
+
+
+def init_wandb_and_create_output_folder(args):
+    # Initialize wandb only on the first process
+    if args.distributed and (args.gpu != 0 or args.rank != 0):
+        return
+
+    # Initialize wand if args.wandb_project and WANDB_API_KEY are set
+    if args.wandb_project:
+        if "WANDB_API_KEY" not in os.environ or not os.environ["WANDB_API_KEY"]:
+            raise Exception("Please set the 'WANDB_API_KEY' environment variable to use wandb.")
+
+        import wandb
+        wandb.init(project=args.wandb_project, config=args)
+
+        if args.output_dir:
+            args.output_dir = (Path(args.output_dir) / wandb.run.id).absolute().resolve()
+            wandb.config.update({"output_dir": str(args.output_dir)}, allow_val_change=True)
+            print(f"Output directory set to '{args.output_dir}'")
+
+    # Create output folder
+    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
+
+
+def log_wandb(*args, **kwargs):
+    if is_main_process() and "wandb" in sys.modules:
+        import wandb
+        wandb.log(*args, **kwargs)
